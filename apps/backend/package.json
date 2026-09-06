@@ -1,0 +1,40 @@
+{
+  "name": "@wpt/backend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@wpt/crypto": "workspace:*",
+    "@wpt/shared": "workspace:*",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
+    "express": "^4.21.0",
+    "helmet": "^8.3.0",
+    "jose": "^6.2.10",
+    "libphonenumber-js": "^1.13.11",
+    "pg": "^8.23.0",
+    "socket.io": "^4.8.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.23.1",
+    "@typescript-eslint/eslint-plugin": "^8.67.0",
+    "@typescript-eslint/parser": "^8.67.0",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "8.57.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

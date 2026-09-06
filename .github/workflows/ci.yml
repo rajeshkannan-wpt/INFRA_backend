@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-typecheck:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+# NOTE: this workflow enforces "lint + typecheck on every PR" from §5.
+# It does NOT enforce "main always deployable / PR review required" —
+# that half of §5 is a GitHub *repo setting* (Settings > Branches > branch
+# protection rule on `main`: require PR before merge, require this status
+# check, disallow direct pushes). No workflow file can set that; whoever
+# owns the GitHub org needs to turn it on once the repo exists.

@@ -1,0 +1,23 @@
+{
+  "name": "@wpt/crypto",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^1.2.0",
+    "@noble/curves": "^2.0.0",
+    "@noble/hashes": "^2.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.67.0",
+    "@typescript-eslint/parser": "^8.67.0",
+    "eslint": "^8.57.1",
+    "typescript": "^5.6.0"
+  }
+}
