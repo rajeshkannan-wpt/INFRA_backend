@@ -172,7 +172,7 @@ export default function SplashScreen() {
 
       {/* Top bar */}
       <View style={styles.top}>
-        <Text style={styles.topLabel}>SEALINE</Text>
+        <Text style={styles.topLabel}>WPT</Text>
         <Text style={[styles.topLabel, { color: COLORS.inkDim }]}>v1.0</Text>
       </View>
 
@@ -191,7 +191,7 @@ export default function SplashScreen() {
           ]}
         />
         <View style={styles.wordmarkWrap}>
-          <Text style={styles.wordmark}>SEALINE</Text>
+          <Text style={styles.wordmark}>WPT</Text>
           <Text style={styles.tagline}>Begin quietly</Text>
         </View>
       </View>
