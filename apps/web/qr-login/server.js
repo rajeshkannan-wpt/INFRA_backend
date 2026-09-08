@@ -30,7 +30,7 @@ const users=[
 {id:'rahul',name:'Rahul',role:'member'},
 {id:'dinesh',name:'Dinesh',role:'member'}
 ];
-const groups=[{id:'project',name:'Project Group',description:'Sealine project team',memberIds:['mervin','pravan','satheesh','rajesh','krisha','jenslin'],settings:{membersCanMessage:true,membersCanAdd:false}}];
+const groups=[{id:'project',name:'Project Group',description:'WPT project team',memberIds:['mervin','pravan','satheesh','rajesh','krisha','jenslin'],settings:{membersCanMessage:true,membersCanAdd:false}}];
 const messages=new Map();
 const onlineUsers=new Set();
 // QA state for QR-1.3 / 1.4 demo mobile.
@@ -41,7 +41,7 @@ const user=id=>users.find(u=>u.id===id);
 const now=()=>new Date().toISOString();
 function seed(){
  if(messages.size)return;
- messages.set(key('mervin','pravan'),[{id:'seed1',from:'pravan',text:'Hi Mervin! Welcome to Sealine.',time:now()}]);
+ messages.set(key('mervin','pravan'),[{id:'seed1',from:'pravan',text:'Hi Mervin! Welcome to WPT.',time:now()}]);
  messages.set(groupKey('project'),[{id:'seed2',from:'pravan',text:'Welcome to the Project Group 👋',time:now()}]);
 }
 seed();
@@ -68,7 +68,7 @@ function lanIp(){
  return ips.find(ip=>ip.startsWith('192.168.')) || ips.find(ip=>ip.startsWith('10.')) || ips.find(ip=>ip.startsWith('172.')) || ips[0] || null;
 }
 function publicOrigin(req){
- const configured=process.env.PUBLIC_BASE_URL || process.env.SEALINE_PUBLIC_BASE_URL;
+ const configured=process.env.PUBLIC_BASE_URL || process.env.WPT_PUBLIC_BASE_URL;
  if(configured) return configured.replace(/\/$/,'');
  const host=req.headers.host||`localhost:${PORT}`;
  const hostname=host.split(':')[0];
@@ -117,7 +117,7 @@ function invalidateWebForUser(uid,reason='new_phone_login'){
  // notified above.
 }
 
-app.get('/api/health',(req,res)=>res.json({ok:true,service:'Sealine Chat',users:users.length,groups:groups.length,socketio:true}));
+app.get('/api/health',(req,res)=>res.json({ok:true,service:'WPT Chat',users:users.length,groups:groups.length,socketio:true}));
 app.get('/api/users',(req,res)=>res.json(users));
 app.get('/api/groups',(req,res)=>res.json(groups.map(g=>({...g,members:g.memberIds.map(user)}))));
 app.get('/api/messages/:a/:b',(req,res)=>res.json(messages.get(key(req.params.a,req.params.b))||[]));
@@ -157,7 +157,7 @@ app.get('/api/link/new',(req,res)=>{
 app.get('/api/link/:token',(req,res)=>{
  const s=findQr(req.params.token); if(!s)return res.status(410).json({ok:false,error:'This QR has expired or is no longer valid.'});
  if(s.status!=='active')return res.status(410).json({ok:false,error:'This QR has already been used.'});
- res.json({ok:true,accountName:user(s.accountId).name,accountHint:'Sealine account',expiresAt:s.expiresAt});
+ res.json({ok:true,accountName:user(s.accountId).name,accountHint:'WPT account',expiresAt:s.expiresAt});
 });
 app.post('/api/link/:token/confirm',(req,res)=>{
  const s=findQr(req.params.token); if(!s)return res.status(410).json({ok:false,error:'This QR has expired or is no longer valid.'});
@@ -203,4 +203,4 @@ io.on('connection',socket=>{
  socket.on('disconnect',()=>{if(socket.userId){const stillOnline=[...io.sockets.sockets.values()].some(s=>s.userId===socket.userId);if(!stillOnline){onlineUsers.delete(socket.userId);io.emit('presenceChanged',{userId:socket.userId,online:false});}}});
 });
 
-server.listen(PORT,'0.0.0.0',()=>{console.log(`Sealine running: http://localhost:${PORT}`);console.log(`LAN: ${lanIps().map(ip=>`http://${ip}:${PORT}`).join(' | ')||'No private LAN IPv4 found'}`);console.log('QR base: '+(process.env.PUBLIC_BASE_URL||process.env.SEALINE_PUBLIC_BASE_URL||'auto-detected LAN address'));});
+server.listen(PORT,'0.0.0.0',()=>{console.log(`WPT running: http://localhost:${PORT}`);console.log(`LAN: ${lanIps().map(ip=>`http://${ip}:${PORT}`).join(' | ')||'No private LAN IPv4 found'}`);console.log('QR base: '+(process.env.PUBLIC_BASE_URL||process.env.WPT_PUBLIC_BASE_URL||'auto-detected LAN address'));});

@@ -1,6 +1,6 @@
-# Sealine QR 1.1 Jakob UX — QR flow + QR 1.3–1.7 functional integration
+# WPT QR 1.1 Jakob UX — QR flow + QR 1.3–1.7 functional integration
 
-This build keeps the Sealine QR 1.1 Jakob UX chat UI as the visual base. QR/link behavior is added as a functional layer without replacing the chat design.
+This build keeps the WPT QR 1.1 Jakob UX chat UI as the visual base. QR/link behavior is added as a functional layer without replacing the chat design.
 
 ## Run
 
@@ -19,7 +19,7 @@ Open the **LAN URL printed by the server** on the computer, not `localhost`, whe
 4. Phone shows **Link this account?**.
 5. Phone taps **Confirm & Link Web**.
 6. Server pushes the link result to the Web QR channel.
-7. Web stores its own Web session and opens the existing Sealine 1.0 chat UI.
+7. Web stores its own Web session and opens the existing WPT 1.0 chat UI.
 8. Web continues independently of phone connectivity.
 9. Log off clears the Web session and requires a fresh QR.
 10. Browser close/reopen keeps the Web session through localStorage while the server session remains valid.

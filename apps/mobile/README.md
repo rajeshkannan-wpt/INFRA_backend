@@ -1,6 +1,6 @@
-# Sealine Mobile
+# WPT Mobile
 
-Expo (React Native) app for Sealine. Uses file-based routing with `expo-router`.
+Expo (React Native) app for WPT. Uses file-based routing with `expo-router`.
 
 The project follows Expo's **Continuous Native Generation (CNG)** workflow, so it works with **both Expo Go and Android Studio**.
 
@@ -29,8 +29,8 @@ The native `android/` folder is generated and gitignored. Generate it, then open
 
 ```bash
 pnpm install
-pnpm --filter sealine-mobile prebuild:android    # or: npx expo prebuild -p android
-pnpm --filter sealine-mobile android             # or: npx expo run:android
+pnpm --filter @wpt/mobile prebuild:android    # or: npx expo prebuild -p android
+pnpm --filter @wpt/mobile android             # or: npx expo run:android
 ```
 
 Then open `apps/mobile/android` in Android Studio (File > Open) to edit native code,

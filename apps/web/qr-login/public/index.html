@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sealine - WhatsApp Web</title>
+<title>WPT - WhatsApp Web</title>
 
 <!-- Font Awesome 6 (Free) for real icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -49,7 +49,7 @@
   box-sizing: border-box;
 }
 
-/* Sealine motion + typography system */
+/* WPT motion + typography system */
 html, body, button, input, textarea, select { font-family: "Lato", Arial, sans-serif; }
 button, .icon-btn, .icon-btn-sm, .chat-item, .settings-item, .theme-option, .search-wrapper, .input-wrapper, .modal, .app-menu, .profile-container, .sidebar-icons, .sidebar-chats, .chat-panel, .message, .message-input-area { transition: background-color .22s ease, color .22s ease, border-color .22s ease, box-shadow .22s ease, opacity .22s ease, transform .22s cubic-bezier(.2,.7,.2,1); }
 button:active, .icon-btn:active, .icon-btn-sm:active { transform: scale(.96); }
@@ -1318,7 +1318,7 @@ body.light-theme .search-wrapper,body.light-theme .input-wrapper{background:#f0f
 @media(max-width:900px){.settings-sidebar{width:100%;min-width:100%}.settings-detail{display:none}.settings-top{padding-left:20px;padding-right:20px}.settings-scroll{padding-left:20px;padding-right:20px}}
 
 
-/* ===== Sealine interaction polish ===== */
+/* ===== WPT interaction polish ===== */
 .chat-header .left .back-btn,
 .settings-back{background:var(--panel2);border:1px solid var(--line);color:var(--text);box-shadow:0 4px 14px rgba(0,0,0,.12);transition:all .22s cubic-bezier(.2,.7,.2,1)!important}
 .chat-header .left .back-btn:hover,
@@ -1366,7 +1366,7 @@ body.light-theme .emoji-picker,body.light-theme .attachment-popover{background:#
 
 </style>
 <style>
-/* Sealine QR 1.0 linking gate — intentionally uses the same 1.0 visual system */
+/* WPT QR 1.0 linking gate — intentionally uses the same 1.0 visual system */
 #welcomeOverlay{position:fixed;inset:0;z-index:1000;display:none;place-items:center;background:rgba(8,12,16,.92);backdrop-filter:blur(18px);opacity:0;transition:opacity .35s ease;}
 #welcomeOverlay.show{display:grid;opacity:1;}
 .welcome-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:34px 42px;border:1px solid rgba(63,198,184,.25);border-radius:28px;background:linear-gradient(145deg,rgba(24,29,36,.96),rgba(14,18,23,.94));box-shadow:0 30px 90px rgba(0,0,0,.45);transform:translateY(16px) scale(.97);animation:welcomeIn .5s cubic-bezier(.2,.8,.2,1) forwards;}
@@ -1412,19 +1412,19 @@ body.light-theme .emoji-picker,body.light-theme .attachment-popover{background:#
 <div class="linkGate hidden" id="linkGate">
   <div class="linkCard">
     <section class="linkIntro">
-      <div class="linkBrand"><div class="logo">S</div><div class="brandText"><b>Sealine</b><small>Secure Web linking</small></div></div>
-      <h1>Link Sealine Web</h1>
-      <p>Scan this QR code from the Sealine mobile app to securely connect this browser. The QR expires automatically and can only be used once.</p>
-      <div class="linkStep"><span class="stepNo">1</span><div><b>Open Sealine on your phone</b><small>Use the same account you want to connect.</small></div></div>
+      <div class="linkBrand"><div class="logo">S</div><div class="brandText"><b>WPT</b><small>Secure Web linking</small></div></div>
+      <h1>Link WPT Web</h1>
+      <p>Scan this QR code from the WPT mobile app to securely connect this browser. The QR expires automatically and can only be used once.</p>
+      <div class="linkStep"><span class="stepNo">1</span><div><b>Open WPT on your phone</b><small>Use the same account you want to connect.</small></div></div>
       <div class="linkStep"><span class="stepNo">2</span><div><b>Scan the QR code</b><small>Your phone will show a confirmation before linking.</small></div></div>
-      <div class="linkStep"><span class="stepNo">3</span><div><b>Confirm the link</b><small>This browser will open your Sealine workspace automatically.</small></div></div>
+      <div class="linkStep"><span class="stepNo">3</span><div><b>Confirm the link</b><small>This browser will open your WPT workspace automatically.</small></div></div>
     </section>
     <section class="qrSide">
-      <div class="qrFrame"><img id="qrImage" alt="Sealine Web linking QR"></div>
+      <div class="qrFrame"><img id="qrImage" alt="WPT Web linking QR"></div>
       <div class="qrTitle" id="qrTitle">Scan to link</div>
       <div class="qrStatus" id="qrStatus">Creating a secure one-time QR…</div>
       <div class="qrTimer" id="qrTimer">Expires in <b>60s</b></div>
-      <div class="linkedBadge" id="linkedBadge">✓ Account linked — opening Sealine Web…</div>
+      <div class="linkedBadge" id="linkedBadge">✓ Account linked — opening WPT Web…</div>
     </section>
   </div>
 </div>
@@ -1435,7 +1435,7 @@ body.light-theme .emoji-picker,body.light-theme .attachment-popover{background:#
 <div id="welcomeOverlay" aria-hidden="true">
   <div class="welcome-card">
     <div class="welcome-mark"><i class="fas fa-water"></i></div>
-    <div class="welcome-title">Welcome to Sealine</div>
+    <div class="welcome-title">Welcome to WPT</div>
     <div class="welcome-sub">Your Web session is ready.</div>
   </div>
 </div>
@@ -1476,7 +1476,7 @@ body.light-theme .emoji-picker,body.light-theme .attachment-popover{background:#
       <div class="settings-item logout" id="settingsLogout"><i class="fas fa-sign-out-alt"></i><div class="item-copy"><div class="item-title">Log out</div></div></div>
       <div class="profile-danger-box">
         <b>Delete profile</b>
-        <span>Remove this demo profile and its locally saved Sealine data from this browser.</span>
+        <span>Remove this demo profile and its locally saved WPT data from this browser.</span>
         <button type="button" class="delete-profile-btn" id="deleteProfileBtn"><i class="fas fa-trash"></i> Delete profile</button>
       </div>
     </div>
@@ -1484,14 +1484,14 @@ body.light-theme .emoji-picker,body.light-theme .attachment-popover{background:#
   <section class="settings-detail">
     <div id="helpDetailCard">
       <div class="help-title">Help and feedback</div>
-      <div class="help-sub">Sealine help, feedback, Terms of Service, and Privacy Policy.</div>
+      <div class="help-sub">WPT help, feedback, Terms of Service, and Privacy Policy.</div>
       <div class="help-warning"><b>Draft document:</b> Terms of Service &amp; Privacy Policy v1.1 is marked as a draft prepared for legal review and should not be treated as an approved production policy.</div>
       <div class="help-actions">
         <button id="openPolicyBtn">Open Terms &amp; Privacy Policy</button>
         <button id="feedbackBtn">Send feedback</button>
       </div>
       <div class="help-facts">
-        <div class="help-fact"><b>Security</b><span>Sealine is described as an end-to-end encrypted messaging service. The policy states that encryption keys are stored on the user's device, and for Web, in the browser client.</span></div>
+        <div class="help-fact"><b>Security</b><span>WPT is described as an end-to-end encrypted messaging service. The policy states that encryption keys are stored on the user's device, and for Web, in the browser client.</span></div>
         <div class="help-fact"><b>New-device login</b><span>Logging in on a new device automatically signs out another active phone or Web session tied to the account.</span></div>
         <div class="help-fact"><b>Data collection</b><span>The draft lists phone number, profile information, optional contact matching, device/technical data, and message metadata. Normal message content is not collected in readable form.</span></div>
         <div class="help-fact"><b>Web client</b><span>The draft says the Web client stores only data needed for service function, including session/link state, and keeps Web encryption keys locally in the browser.</span></div>
@@ -1650,7 +1650,7 @@ body.light-theme .emoji-picker,body.light-theme .attachment-popover{background:#
   <button data-attach="audio"><i class="fas fa-microphone"></i><span>Audio</span></button>
   <button data-attach="share"><i class="fas fa-share-nodes"></i><span>Share</span></button>
 </div>
-<input type="file" id="sealineFileInput" hidden>
+<input type="file" id="wptFileInput" hidden>
 <div class="share-card" id="shareCard" aria-hidden="true"><div class="share-panel"><h3>Share</h3><p id="shareText">Share this conversation or selected content.</p><div class="share-actions"><button id="shareNativeBtn" class="primary">Share</button><button id="shareCopyBtn">Copy</button><button id="shareCloseBtn">Cancel</button></div></div></div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -1659,7 +1659,7 @@ body.light-theme .emoji-picker,body.light-theme .attachment-popover{background:#
 // ============================================
 // QR 1.0 linking gate + persistent Web session
 // ============================================
-const WEB_SESSION_KEY = 'sealine_web_session_v1';
+const WEB_SESSION_KEY = 'wpt_web_session_v1';
 let qrToken=null, qrTimerId=null, qrSocket=null, webSocket=null;
 window.webToken=null;
 
@@ -1780,7 +1780,7 @@ async function createLinkQR(){
 
     qrToken=d.token||d.sessionId;
     image.src=d.qrDataUrl;
-    status.textContent='Ready — scan with Sealine on your phone.';
+    status.textContent='Ready — scan with WPT on your phone.';
 
     let left=Math.max(0,Math.ceil((Number(d.expiresAt)-Date.now())/1000));
     timer.innerHTML='Expires in <b>'+left+'s</b>';
@@ -1884,7 +1884,7 @@ let currentFilter = 'all';
 let searchQuery = '';
 
 // Persistent chat state: closing/reopening the browser keeps every chat and message.
-const APP_STATE_KEY='sealine_web_app_state_v1';
+const APP_STATE_KEY='wpt_web_app_state_v1';
 function saveAppState(){
   try{localStorage.setItem(APP_STATE_KEY,JSON.stringify({recentChats,chatHistory,activeChatId,savedAt:Date.now()}));}catch(e){console.warn('Could not save chat state',e);}
 }
@@ -2298,9 +2298,9 @@ console.log('  • fa-paperclip (Attach)');
 <script>
 (function(){
   function showToast(text){
-    let t=document.getElementById('sealineToast');
-    if(!t){t=document.createElement('div');t.id='sealineToast';t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translate(-50%,15px);opacity:0;z-index:1200;background:#202c33;color:#e9edef;padding:11px 16px;border-radius:9px;box-shadow:0 12px 30px rgba(0,0,0,.35);font-size:13px;transition:.2s;pointer-events:none';document.body.appendChild(t);}
-    t.textContent=text;t.style.opacity='1';t.style.transform='translate(-50%,0)';clearTimeout(window.__sealineToastTimer);window.__sealineToastTimer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translate(-50%,15px)'},1700);
+    let t=document.getElementById('wptToast');
+    if(!t){t=document.createElement('div');t.id='wptToast';t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translate(-50%,15px);opacity:0;z-index:1200;background:#202c33;color:#e9edef;padding:11px 16px;border-radius:9px;box-shadow:0 12px 30px rgba(0,0,0,.35);font-size:13px;transition:.2s;pointer-events:none';document.body.appendChild(t);}
+    t.textContent=text;t.style.opacity='1';t.style.transform='translate(-50%,0)';clearTimeout(window.__wptToastTimer);window.__wptToastTimer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translate(-50%,15px)'},1700);
   }
   const overlay=document.getElementById('profileSettingsOverlay');
   const profile=document.querySelector('.profile-container');
@@ -2317,16 +2317,16 @@ console.log('  • fa-paperclip (Attach)');
   const resetWallpaperBtn=document.getElementById('resetWallpaperBtn');
   const wallpaperPreview=document.getElementById('chatWallpaperPreview');
   const messagesArea=document.getElementById('messagesArea');
-  let currentTheme=localStorage.getItem('sealine-theme')||'dark';
+  let currentTheme=localStorage.getItem('wpt-theme')||'dark';
   const defaultWallpaper="url('/image/bg.png')";
-  let savedWallpaper=localStorage.getItem('sealine-light-wallpaper')||'';
+  let savedWallpaper=localStorage.getItem('wpt-light-wallpaper')||'';
 
   function setLightWallpaper(value){
     savedWallpaper=value||'';
-    if(savedWallpaper) localStorage.setItem('sealine-light-wallpaper',savedWallpaper);
-    else localStorage.removeItem('sealine-light-wallpaper');
+    if(savedWallpaper) localStorage.setItem('wpt-light-wallpaper',savedWallpaper);
+    else localStorage.removeItem('wpt-light-wallpaper');
     const cssValue=savedWallpaper ? `url(\"${savedWallpaper}\")` : defaultWallpaper;
-    document.documentElement.style.setProperty('--sealine-light-wallpaper',cssValue);
+    document.documentElement.style.setProperty('--wpt-light-wallpaper',cssValue);
     if(messagesArea){
       // Keep a visible light-gray layer over every wallpaper, including custom photos.
       // The overlay is part of the same background image, so it still works while scrolling.
@@ -2346,7 +2346,7 @@ console.log('  • fa-paperclip (Attach)');
   function applyTheme(theme){
     currentTheme=theme;
     document.body.classList.toggle('light-theme',theme==='light');
-    localStorage.setItem('sealine-theme',theme);
+    localStorage.setItem('wpt-theme',theme);
     document.querySelectorAll('.theme-option').forEach(b=>b.classList.toggle('selected',b.dataset.themeChoice===theme));
     if(themeSub) themeSub.textContent=theme==='light'?'Light theme enabled · custom chat wallpaper':'Dark theme enabled';
     setLightWallpaper(savedWallpaper);
@@ -2436,7 +2436,7 @@ console.log('  • fa-paperclip (Attach)');
 <script>
 (function(){
   const $id=id=>document.getElementById(id);
-  const picker=$id('emojiPicker'), grid=$id('emojiGrid'), attach=$id('attachmentPopover'), file=$id('sealineFileInput');
+  const picker=$id('emojiPicker'), grid=$id('emojiGrid'), attach=$id('attachmentPopover'), file=$id('wptFileInput');
   const input=$id('messageInput'), area=$id('messagesArea');
   const emojis=['😀','😃','😄','😁','😆','😅','😂','🤣','😊','🙂','🙃','😉','😍','🥰','😘','😎','🤔','😢','😭','😡','😮','😴','🤗','🤝','👍','👎','👏','🙏','🔥','❤️','💯','🎉','✨','💪','🙌','💙','💚','💛','🫶','😇','🤩','😜','😋','🤭','😱','🤯','🥳','🌟','☀️','🌈','🍕','🎵','⚽','🎮','🚗','📸','🎬'];
   grid.innerHTML=emojis.map(e=>`<button type="button" data-emoji="${e}">${e}</button>`).join('');
@@ -2477,15 +2477,15 @@ console.log('  • fa-paperclip (Attach)');
 
   // Native share + clipboard fallback.
   const shareCard=$id('shareCard'), shareNative=$id('shareNativeBtn'), shareCopy=$id('shareCopyBtn'), shareClose=$id('shareCloseBtn'), shareText=$id('shareText');
-  function openShare(){shareText.textContent=activeChatId?`Share your conversation with ${recentChats.find(c=>c.id===activeChatId)?.name||'this contact'}.`:'Share Sealine';shareCard.classList.add('open');shareCard.setAttribute('aria-hidden','false');}
+  function openShare(){shareText.textContent=activeChatId?`Share your conversation with ${recentChats.find(c=>c.id===activeChatId)?.name||'this contact'}.`:'Share WPT';shareCard.classList.add('open');shareCard.setAttribute('aria-hidden','false');}
   function closeShare(){shareCard.classList.remove('open');shareCard.setAttribute('aria-hidden','true');}
   shareClose.addEventListener('click',closeShare);shareCard.addEventListener('click',e=>{if(e.target===shareCard)closeShare();});
-  shareNative.addEventListener('click',async()=>{try{if(navigator.share) await navigator.share({title:'Sealine',text:shareText.textContent});else await navigator.clipboard.writeText(shareText.textContent);showToast('Shared successfully');}catch(e){}closeShare();});
+  shareNative.addEventListener('click',async()=>{try{if(navigator.share) await navigator.share({title:'WPT',text:shareText.textContent});else await navigator.clipboard.writeText(shareText.textContent);showToast('Shared successfully');}catch(e){}closeShare();});
   shareCopy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(shareText.textContent);showToast('Share text copied');}catch(e){showToast('Copy unavailable')}});
 
   // Make chat three-dot menu actions meaningful and repeatable.
   const menu=$id('chatMenu'), btn=$id('chatMenuBtn');
-  function toast(t){if(typeof showToast==='function')showToast(t);else{let x=document.getElementById('sealineToast');if(x){x.textContent=t;x.style.opacity=1;setTimeout(()=>x.style.opacity=0,1500)}}}
+  function toast(t){if(typeof showToast==='function')showToast(t);else{let x=document.getElementById('wptToast');if(x){x.textContent=t;x.style.opacity=1;setTimeout(()=>x.style.opacity=0,1500)}}}
   function close(){if(menu){menu.classList.remove('open');menu.setAttribute('aria-hidden','true')}}
   if(btn){btn.addEventListener('click',e=>{e.stopPropagation();close();requestAnimationFrame(()=>{const r=btn.getBoundingClientRect();menu.style.top=(r.bottom+8)+'px';menu.style.right=(window.innerWidth-r.right)+'px';menu.style.left='auto';menu.classList.add('open');menu.setAttribute('aria-hidden','false')})})}
   document.querySelectorAll('#chatMenu [data-chat-action]').forEach(b=>b.addEventListener('click',()=>{
@@ -2502,7 +2502,7 @@ console.log('  • fa-paperclip (Attach)');
   const back=$id('backBtn');if(back)back.addEventListener('mouseenter',()=>back.classList.add('hover-fix'));if(back)back.addEventListener('mouseleave',()=>back.classList.remove('hover-fix'));
 
   // Improve help/feedback with functional actions.
-  const feedback=$id('feedbackBtn');if(feedback)feedback.addEventListener('click',()=>{const subject=encodeURIComponent('Sealine feedback');const body=encodeURIComponent('Hello Sealine team,\n\nMy feedback:\n');window.location.href=`mailto:support@sealine.app?subject=${subject}&body=${body}`});
+  const feedback=$id('feedbackBtn');if(feedback)feedback.addEventListener('click',()=>{const subject=encodeURIComponent('WPT feedback');const body=encodeURIComponent('Hello WPT team,\n\nMy feedback:\n');window.location.href=`mailto:support@wpt.app?subject=${subject}&body=${body}`});
   const policy=$id('openPolicyBtn');if(policy)policy.addEventListener('click',()=>{const v=$id('policyViewer');if(v){v.src='/docs/WPT_Terms_of_Service_Privacy_Policy_v1.1.pdf';v.style.display='block';v.scrollIntoView({behavior:'smooth',block:'center'})}});
 })();
 </script>
@@ -2526,13 +2526,13 @@ console.log('  • fa-paperclip (Attach)');
   const deleteBtn=document.getElementById('deleteProfileBtn');
   if(!deleteBtn)return;
   deleteBtn.addEventListener('click',()=>{
-    const ok=confirm('Delete this demo profile and all locally saved Sealine chats/messages from this browser? This cannot be undone.');
+    const ok=confirm('Delete this demo profile and all locally saved WPT chats/messages from this browser? This cannot be undone.');
     if(!ok)return;
     try{
-      localStorage.removeItem('sealine_web_app_state_v1');
-      localStorage.removeItem('sealine_web_session_v1');
-      localStorage.removeItem('sealine-theme');
-      localStorage.removeItem('sealine-wallpaper');
+      localStorage.removeItem('wpt_web_app_state_v1');
+      localStorage.removeItem('wpt_web_session_v1');
+      localStorage.removeItem('wpt-theme');
+      localStorage.removeItem('wpt-wallpaper');
     }catch(e){}
     location.reload();
   });
