@@ -1,4 +1,4 @@
-﻿// app/profile-setup.tsx
+// app/profile-setup.tsx
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -240,7 +240,7 @@ export default function ProfileSetupScreen() {
               onPress={handleContinue}
             >
               <Text style={styles.btnText}>
-                {isLoading ? 'Setting upâ€¦' : 'CONTINUE'}
+                {isLoading ? 'Setting up…' : 'CONTINUE'}
               </Text>
             </Pressable>
 
@@ -328,7 +328,7 @@ export default function ProfileSetupScreen() {
   );
 }
 
-// â”€â”€â”€ Styles â€“ content aligned to top â”€â”€â”€
+// ─── Styles – content aligned to top ───
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -353,9 +353,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 4,              // ðŸ‘ˆ minimal top padding â€“ content starts near top
+    paddingTop: 4,              // 👈 minimal top padding – content starts near top
     paddingBottom: 40,
-    // no justifyContent â€“ content sticks to top
+    // no justifyContent – content sticks to top
   },
   content: {
     width: '100%',

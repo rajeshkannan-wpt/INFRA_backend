@@ -13,4 +13,3 @@ Read the exact versioned docs at https://docs.expo.dev/versions/v54.0.0/ before 
 - OTP screen displays numbers via `formatInternational()` (country code + no trunk zero).
 - Chats tab: new contact → draft chat view only; enters chats store after first message. Existing contact → matched by ID or digits-normalized phone → opens stored history.
 - `Colors` export lives in `constants/countries.ts` (theme.ts was renamed); themed components import it from there.
-- Known pre-existing type/lint issues remain in `(tabs)/explore.tsx` ×3 — intentionally untouched.

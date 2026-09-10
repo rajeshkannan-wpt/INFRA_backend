@@ -1,4 +1,4 @@
-﻿/**
+/**
  * DB-2.2 — Message relay routes.
  *
  * Used for functional verification of the message_relay table:

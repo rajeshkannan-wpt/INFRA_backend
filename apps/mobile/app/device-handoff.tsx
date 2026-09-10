@@ -35,12 +35,12 @@ export default function DeviceHandoffScreen() {
           await SecureStore.setItemAsync('displayPhone', formatted);
         }
         setIsLoading(false);
-      } catch (error) {
+      } catch {
         setIsLoading(false);
       }
     };
     performHandoff();
-  }, [userId, phoneNumber]);
+  }, [userId, phoneNumber, createSession]);
 
   const handleContinue = () => {
     router.replace('/(tabs)');

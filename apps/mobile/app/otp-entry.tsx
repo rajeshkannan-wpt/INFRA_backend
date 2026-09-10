@@ -1,4 +1,4 @@
-﻿// app/otp-entry.tsx
+// app/otp-entry.tsx
 import { onboardingApi } from '@/api/onboardingApi';
 import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
 import { Ionicons } from '@expo/vector-icons';
@@ -126,7 +126,7 @@ export default function OtpEntryScreen() {
 
         if (result.status === 'success') {
           const deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-          // Write all tokens in parallel â€” saves ~100ms on cold storage.
+          // Write all tokens in parallel — saves ~100ms on cold storage.
           await Promise.all([
             SecureStore.setItemAsync('userId', result.userId),
             SecureStore.setItemAsync('deviceId', deviceId),
@@ -214,7 +214,7 @@ export default function OtpEntryScreen() {
   const handleResend = async () => {
     if (resendCooldown > 0) return;
 
-    // Fire resend optimistically â€” update UI immediately, don't block on network.
+    // Fire resend optimistically — update UI immediately, don't block on network.
     setResendCooldown(30);
     setExpirySeconds(CODE_LIFETIME);
     setOtp(Array(BOXES).fill(''));
@@ -300,7 +300,7 @@ export default function OtpEntryScreen() {
               {error ? (
                 <Text style={styles.error}>{error}</Text>
               ) : expired ? (
-                <Text style={styles.expired}>OTP expired â€” request a new one</Text>
+                <Text style={styles.expired}>OTP expired — request a new one</Text>
               ) : (
                 <Text style={styles.expiry}>
                   OTP expires in <Text style={styles.expiryTime}>{clock}</Text>
@@ -324,7 +324,7 @@ export default function OtpEntryScreen() {
               disabled={OTP.length !== BOXES || isVerifying || isLocked || expired}
               onPress={() => verify(OTP)}
             >
-              <Text style={styles.btnText}>{isVerifying ? 'Verifyingâ€¦' : 'Verify'}</Text>
+              <Text style={styles.btnText}>{isVerifying ? 'Verifying…' : 'Verify'}</Text>
             </Pressable>
 
             <Pressable
@@ -352,7 +352,7 @@ export default function OtpEntryScreen() {
   );
 }
 
-// â”€â”€â”€ Styles (hardcoded fonts) â”€â”€â”€
+// ─── Styles (hardcoded fonts) ───
 const styles = StyleSheet.create({
   safeRoot: {
     flex: 1,
