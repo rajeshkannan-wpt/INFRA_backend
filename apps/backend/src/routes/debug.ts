@@ -9,13 +9,13 @@
  * Remove entirely before production deploy.
  */
 
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, type NextFunction } from "express";
 import { getDb } from "../db/index.js";
 import { issueAdminToken } from "../auth/jwt.js";
 
 const router: Router = Router();
 
-function requireDebug(req: Request, res: Response, next: Function) {
+function requireDebug(req: Request, res: Response, next: NextFunction) {
   if (process.env.DEBUG !== "1") {
     res.status(404).json({ error: "Not found" });
     return;
@@ -109,7 +109,7 @@ ${data.smsOutbox.map((r) => `<tr><td>${r.phone_number}</td><td style="font-size:
 ${data.legalAcceptances.map((r) => `<tr><td>${r.phone_number}</td><td>${r.legal_version}</td><td>${r.accepted_at}</td></tr>`).join("\n")}</table>
 
 </body></html>`);
-  } catch (err) {
+  } catch {
     console.error("Debug route error");
     res.status(500).json({ error: "Internal server error" });
   }
@@ -132,7 +132,7 @@ router.get("/admin-token", async (_req: Request, res: Response) => {
     }
     const token = await issueAdminToken(row.id);
     res.json({ adminId: row.id, token });
-  } catch (err) {
+  } catch {
     console.error("Debug admin-token route error");
     res.status(500).json({ error: "Internal server error" });
   }

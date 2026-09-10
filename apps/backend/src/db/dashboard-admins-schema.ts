@@ -14,7 +14,6 @@ import {
   text,
   boolean,
   timestamp,
-  check,
 } from "drizzle-orm/pg-core";
 
 export const dashboardAdmins = pgTable(

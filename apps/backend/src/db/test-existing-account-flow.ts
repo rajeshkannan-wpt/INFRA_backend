@@ -32,7 +32,6 @@ const BASE = process.env.BACKEND_URL || "http://localhost:4000";
 const API = `${BASE}/api/v1/onboarding`;
 
 const NEW_NUMBER = "+919000000001";
-const EXISTING_NUMBER = "+919000000002";
 
 async function post(path: string, body: unknown) {
   const res = await fetch(`${API}${path}`, {

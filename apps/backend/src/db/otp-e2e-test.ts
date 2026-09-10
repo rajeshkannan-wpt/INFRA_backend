@@ -28,7 +28,7 @@ function assert(label: string, condition: boolean, detail?: string) {
   }
 }
 
-async function post(path: string, body: any) {
+async function post(path: string, body: Record<string, unknown>) {
   const res = await fetch(`${BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
