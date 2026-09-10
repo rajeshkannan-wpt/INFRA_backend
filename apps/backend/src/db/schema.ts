@@ -10,3 +10,4 @@ export { dashboardAdmins } from "./dashboard-admins-schema.js";
 export { auditLog, auditAction } from "./audit-log-schema.js";
 export { devices, deviceType, platformEnum } from "./devices-schema.js";
 export { messageRelay } from "./message-relay-schema.js";
+export { groups, groupMembers, whoCanSend, groupMemberRole } from "./groups-schema.js";

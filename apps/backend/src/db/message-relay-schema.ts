@@ -5,21 +5,37 @@
  * to a user with N devices creates N rows, one per recipient_device_id.
  *
  * ciphertext is stored as bytea (never plaintext). Integer size_bytes
- * holds the ciphertext length. The recipient must be exactly one of
- * { recipient_user_id, recipient_device_id, recipient_group_id } —
- * enforced by the message_relay_recipient_exactly_one CHECK constraint.
+ * holds the ciphertext length and must be >= 0. recipient_device_id is
+ * NOT NULL and every row also sets exactly one of recipient_user_id /
+ * recipient_group_id — the user-XOR-group rule enforced by the
+ * message_relay_recipient_exactly_one CHECK constraint.
  */
 
 import {
   pgTable,
+  pgEnum,
   uuid,
   customType,
-  text,
   integer,
   timestamp,
   index,
 } from "drizzle-orm/pg-core";
 import { devices } from "./devices-schema.js";
+import { users } from "./users-schema.js";
+import { groups } from "./groups-schema.js";
+
+/**
+ * message_type enum, matching the live message_type_enum type and the
+ * values verified in the DB-2.2-V evidence (migration 006).
+ */
+export const messageTypeEnum = pgEnum("message_type_enum", [
+  "text",
+  "image",
+  "video",
+  "audio",
+  "file",
+  "system",
+]);
 
 /** bytea column: stores binary ciphertext as a Buffer. */
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
@@ -41,11 +57,17 @@ export const messageRelay = pgTable(
     senderDeviceId: uuid("sender_device_id")
       .notNull()
       .references(() => devices.id, { onDelete: "cascade" }),
-    recipientDeviceId: uuid("recipient_device_id").notNull(),
-    recipientUserId: uuid("recipient_user_id"),
-    recipientGroupId: uuid("recipient_group_id"),
+    recipientDeviceId: uuid("recipient_device_id")
+      .notNull()
+      .references(() => devices.id, { onDelete: "cascade" }),
+    recipientUserId: uuid("recipient_user_id").references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    recipientGroupId: uuid("recipient_group_id").references(() => groups.id, {
+      onDelete: "cascade",
+    }),
     ciphertext: bytea("ciphertext").notNull(),
-    messageType: text("message_type").notNull(),
+    messageType: messageTypeEnum("message_type").notNull().default("text"),
     sizeBytes: integer("size_bytes").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

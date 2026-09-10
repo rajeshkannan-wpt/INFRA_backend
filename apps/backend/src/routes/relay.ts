@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DB-2.2 — Message relay routes.
  *
  * Used for functional verification of the message_relay table:
@@ -21,6 +21,12 @@ const router: Router = Router();
 
 router.use(requireAuth);
 
+// Must match the message_type_enum values verified in the DB-2.2-V
+// evidence (migration 006 / live message_type_enum).
+const MESSAGE_TYPES = new Set(["text", "image", "video", "audio", "file", "system"]);
+
+type MessageType = "text" | "image" | "video" | "audio" | "file" | "system";
+
 // ──────────────────────────────────────────────────
 // POST /relay/send
 // Body: {
@@ -28,14 +34,14 @@ router.use(requireAuth);
 //   recipientDeviceId?: string,
 //   recipientGroupId?: string,
 //   ciphertext: string,   // hex-encoded ciphertext
-//   messageType?: string,
+//   messageType?: MessageType,
 // }
 // If only recipientUserId is given, one row is created per device of
 // that user. Otherwise a single row is created for the given device/group.
 // ──────────────────────────────────────────────────
 router.post("/send", async (req: Request, res: Response) => {
   try {
-    const authUserId = res.locals.auth!.sub;
+    const _authUserId = res.locals.auth!.sub;
     const authDeviceId = res.locals.auth!.deviceId;
 
     const {
@@ -49,7 +55,7 @@ router.post("/send", async (req: Request, res: Response) => {
       recipientDeviceId?: string;
       recipientGroupId?: string;
       ciphertext?: string;
-      messageType?: string;
+      messageType?: MessageType;
     };
 
     if (typeof ciphertext !== "string" || !ciphertext) {
@@ -57,10 +63,25 @@ router.post("/send", async (req: Request, res: Response) => {
       return;
     }
 
+    if (messageType !== undefined && !MESSAGE_TYPES.has(messageType)) {
+      res.status(400).json({
+        error: "messageType must be one of: text, image, video, audio, file, system",
+      });
+      return;
+    }
+
     // Exactly one recipient type must be specified.
     const provided = [recipientUserId, recipientDeviceId, recipientGroupId].filter(Boolean).length;
     if (provided !== 1) {
       res.status(400).json({ error: "Provide exactly one of recipientUserId, recipientDeviceId, recipientGroupId" });
+      return;
+    }
+
+    // recipient_device_id is always NOT NULL, but a row must also name a
+    // user XOR a group (message_relay_recipient_exactly_one). A device-only
+    // target would violate that constraint, so reject it up front.
+    if (!recipientUserId && !recipientGroupId) {
+      res.status(400).json({ error: "A recipient user or group is required" });
       return;
     }
 
@@ -125,7 +146,7 @@ router.post("/send", async (req: Request, res: Response) => {
       });
 
     res.json({ success: true, count: 1, rows: [row] });
-  } catch (err) {
+  } catch (_err) {
     console.error("POST /relay/send error");
     res.status(500).json({ error: "Internal server error" });
   }
@@ -167,7 +188,7 @@ router.post("/poll", async (req: Request, res: Response) => {
         expiresAt: r.expiresAt,
       })),
     });
-  } catch (err) {
+  } catch (_err) {
     console.error("POST /relay/poll error");
     res.status(500).json({ error: "Internal server error" });
   }
@@ -180,7 +201,6 @@ router.post("/poll", async (req: Request, res: Response) => {
 // ──────────────────────────────────────────────────
 router.post("/ack", async (req: Request, res: Response) => {
   try {
-    const authUserId = res.locals.auth!.sub;
     const { messageId } = req.body as { messageId?: string };
 
     if (typeof messageId !== "string" || !messageId) {
@@ -201,7 +221,7 @@ router.post("/ack", async (req: Request, res: Response) => {
     }
 
     res.json({ success: true, messageId: updated.id, deliveredAt: updated.deliveredAt });
-  } catch (err) {
+  } catch (_err) {
     console.error("POST /relay/ack error");
     res.status(500).json({ error: "Internal server error" });
   }
