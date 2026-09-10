@@ -34,7 +34,7 @@ export function normalizePhoneNumber(
 
     // E.164 format: +[country code][subscriber number], no spaces/dashes
     return parsed.format("E.164");
-  } catch (err) {
+  } catch (_err) {
     // parsePhoneNumber throws on invalid input
     return null;
   }
