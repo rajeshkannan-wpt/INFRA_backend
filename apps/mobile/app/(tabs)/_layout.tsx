@@ -1,19 +1,21 @@
-// app/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useThemeContext } from '@/providers/ThemeProvider';
 
 export default function TabLayout() {
+  const { colors } = useThemeContext();
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#0F9C90',
+        tabBarActiveTintColor: colors.accent,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#1C1F26',
-          borderTopColor: '#2E323C',
+          backgroundColor: colors.tabBar,
+          borderTopColor: colors.tabBarBorder,
         },
-        tabBarInactiveTintColor: '#6B7280',
+        tabBarInactiveTintColor: colors.textMuted,
       }}
     >
       <Tabs.Screen
@@ -21,16 +23,7 @@ export default function TabLayout() {
         options={{
           title: 'Chats',
           tabBarIcon: ({ color, size }) => (
-            <Text style={{ color, fontSize: size }}>💬</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color, size }) => (
-            <Text style={{ color, fontSize: size }}>⚙️</Text>
+            <Ionicons name="chatbubble-ellipses" size={size} color={color} />
           ),
         }}
       />

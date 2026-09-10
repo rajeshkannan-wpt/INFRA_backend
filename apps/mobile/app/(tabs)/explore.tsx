@@ -1,15 +1,12 @@
 // app/(tabs)/explore.tsx
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native';
 
 import { ExternalLink } from '@/components/external-link';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Collapsible } from '@/components/ui/collapsible';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
@@ -68,16 +65,6 @@ const features = [
 export default function TabTwoScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  
-  // Dynamic colors based on theme
-  const colors = {
-    headerBg: isDark ? C.bg2 : '#f5f5f5',
-    cardBg: isDark ? C.cardBg : '#ffffff',
-    borderColor: isDark ? C.borderSoft : '#e0e0e0',
-    textColor: isDark ? C.text : '#1a1a1a',
-    textDim: isDark ? C.inkDim : '#666666',
-    iconColor: isDark ? C.ink : '#333333',
-  };
 
   return (
     <LinearGradient
@@ -111,7 +98,7 @@ export default function TabTwoScreen() {
                   Explore
                 </ThemedText>
                 <ThemedText style={[styles.headerSubtitle, { color: isDark ? C.inkDim : '#666666' }]}>
-                  Don&apos;t
+                  Discover what&apos;s possible
                 </ThemedText>
               </View>
             </View>
@@ -253,12 +240,12 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 36,
-    fontFamily: 'Fraunces-Black',
+    fontFamily: 'Lato-Black',
     letterSpacing: 2,
   },
   headerSubtitle: {
     fontSize: 14,
-    fontFamily: 'SpaceGrotesk-Regular',
+    fontFamily: 'Lato-Regular',
     letterSpacing: 1,
     marginTop: 4,
   },
@@ -270,12 +257,12 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     fontSize: 22,
-    fontFamily: 'Fraunces-Black',
+    fontFamily: 'Lato-Black',
     marginBottom: 8,
   },
   greetingSubtext: {
     fontSize: 14,
-    fontFamily: 'SpaceGrotesk-Regular',
+    fontFamily: 'Lato-Regular',
     lineHeight: 22,
   },
   featuresGrid: {
@@ -299,12 +286,12 @@ const styles = StyleSheet.create({
   },
   featureTitle: {
     fontSize: 16,
-    fontFamily: 'SpaceGrotesk-Medium',
+    fontFamily: 'Lato-Bold',
     flex: 1,
   },
   featureDescription: {
     fontSize: 13,
-    fontFamily: 'SpaceGrotesk-Regular',
+    fontFamily: 'Lato-Regular',
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -330,7 +317,7 @@ const styles = StyleSheet.create({
   },
   platformText: {
     fontSize: 12,
-    fontFamily: 'SpaceGrotesk-Medium',
+    fontFamily: 'Lato-Bold',
   },
   linkContainer: {
     flexDirection: 'row',
@@ -340,7 +327,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 13,
-    fontFamily: 'SpaceGrotesk-Medium',
+    fontFamily: 'Lato-Bold',
   },
   footerContainer: {
     alignItems: 'center',
@@ -350,7 +337,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 13,
-    fontFamily: 'SpaceGrotesk-Regular',
+    fontFamily: 'Lato-Regular',
   },
   footerBadges: {
     flexDirection: 'row',
@@ -366,7 +353,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 10,
-    fontFamily: 'SpaceGrotesk-Medium',
+    fontFamily: 'Lato-Bold',
     letterSpacing: 0.5,
   },
 });

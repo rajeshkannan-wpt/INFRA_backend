@@ -16,7 +16,7 @@ import { Metadata, type MetadataJson } from 'libphonenumber-js/core';
 import metadataJson from 'libphonenumber-js/metadata.mobile.json';
 import examples from 'libphonenumber-js/examples.mobile.json';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
+// import { LinearGradient } from 'expo-linear-gradient'; // shimmed for Expo Go
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
@@ -187,10 +187,14 @@ export default function PhoneEntryScreen() {
     setIsLoading(true);
 
     try {
-      await onboardingApi.sendOtp({ phoneNumber: e164 });
+      // Both calls are independent — fire in parallel to halve the wait.
+      await Promise.all([
+        onboardingApi.acceptLegal(e164),
+        onboardingApi.sendOtp({ phoneNumber: e164 }),
+      ]);
       router.push({
         pathname: '/otp-entry',
-        params: { phoneNumber: e164 },
+        params: { phoneNumber: e164, displayPhone: phone },
       });
     } catch {
       Alert.alert('Error', 'Failed to send OTP. Please try again.');
@@ -200,7 +204,7 @@ export default function PhoneEntryScreen() {
   };
 
   return (
-    <LinearGradient
+    <View
       colors={[C.bg2, C.bg]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 0.45 }}
@@ -315,7 +319,7 @@ export default function PhoneEntryScreen() {
           </Animated.View>
         </View>
       </Modal>
-    </LinearGradient>
+    </View>
   );
 }
 

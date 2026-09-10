@@ -1,34 +1,32 @@
-// app/_layout.tsx
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider as NavThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { useFonts } from 'expo-font';
-import { Fraunces_800ExtraBold, Fraunces_400Regular_Italic } from '@expo-google-fonts/fraunces';
-import { SpaceGrotesk_400Regular, SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Lato_400Regular, Lato_400Regular_Italic, Lato_700Bold, Lato_900Black } from '@expo-google-fonts/lato';
+import { ThemeProvider, useThemeContext } from '@/providers/ThemeProvider';
 import { SessionProvider } from '@/providers/SessionProvider';
 
-export const unstable_settings = {
-  anchor: 'OnboardingScreen',
-};
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootLayoutInner() {
+  const { colorScheme, colors } = useThemeContext();
 
   const [fontsLoaded, fontError] = useFonts({
-    'Fraunces-Black': Fraunces_800ExtraBold,
-    'Fraunces-Italic': Fraunces_400Regular_Italic,
-    'SpaceGrotesk-Regular': SpaceGrotesk_400Regular,
-    'SpaceGrotesk-Medium': SpaceGrotesk_500Medium,
+    'Lato-Black': Lato_900Black,
+    'Lato-Italic': Lato_400Regular_Italic,
+    'Lato-Regular': Lato_400Regular,
+    'Lato-Bold': Lato_700Bold,
   });
 
   if (!fontsLoaded && !fontError) {
     return null;
   }
 
+  const navTheme = colorScheme === 'dark'
+    ? { ...DarkTheme, colors: { ...DarkTheme.colors, background: colors.bg, card: colors.tabBar, text: colors.text, border: colors.tabBarBorder, primary: colors.accent } }
+    : { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: colors.bg, card: colors.tabBar, text: colors.text, border: colors.tabBarBorder, primary: colors.accent } };
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <NavThemeProvider value={navTheme}>
       <SessionProvider>
         <Stack
           screenOptions={{
@@ -36,15 +34,24 @@ export default function RootLayout() {
             animation: 'slide_from_right',
           }}
         >
-          {/* Onboarding screens */}
-          <Stack.Screen name="OnboardingScreen" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="phone-entry" options={{ headerShown: false }} />
           <Stack.Screen name="legal-acceptance" options={{ headerShown: false }} />
           <Stack.Screen name="otp-entry" options={{ headerShown: false }} />
           <Stack.Screen name="profile-setup" options={{ headerShown: false }} />
+          <Stack.Screen name="settings" options={{ headerShown: false }} />
+          <Stack.Screen name="scan" options={{ headerShown: false, animation: 'slide_from_bottom' }} />
         </Stack>
-        <StatusBar style="auto" />
+        <StatusBar style={colors.statusBar} />
       </SessionProvider>
+    </NavThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RootLayoutInner />
     </ThemeProvider>
   );
 }

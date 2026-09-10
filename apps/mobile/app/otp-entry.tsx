@@ -4,7 +4,7 @@ import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
 import { Ionicons } from '@expo/vector-icons';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/mobile';
 import { router, useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
+// import { LinearGradient } from 'expo-linear-gradient'; // shimmed for Expo Go
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
@@ -17,6 +17,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as SecureStore from 'expo-secure-store';
 //import * as Device from 'expo-device'; // optional, fallback provided
 
 const C = {
@@ -43,8 +44,9 @@ function formatClock(totalSeconds: number): string {
 }
 
 export default function OtpEntryScreen() {
-  const params = useLocalSearchParams<{ phoneNumber: string }>();
+  const params = useLocalSearchParams<{ phoneNumber: string; displayPhone?: string }>();
   const phoneNumber = params.phoneNumber || '';
+  const displayPhone = params.displayPhone || '';
 
   const [otp, setOtp] = useState<string[]>(Array(BOXES).fill(''));
   const [isLocked, setIsLocked] = useState(false);
@@ -104,21 +106,6 @@ export default function OtpEntryScreen() {
     ]).start();
   }, [shake]);
 
-  // --- Device info helpers ---
-  const getDeviceId = (): string => {
-    return `device_${Math.random().toString(36).slice(2, 10)}`;
-  };
-
-  const getDeviceName = (): string => {
-    return Platform.OS === 'ios' ? 'iPhone' : 'Android Device';
-  };
-
-  const getPlatform = (): 'ios' | 'android' | 'web' => {
-    if (Platform.OS === 'ios') return 'ios';
-    if (Platform.OS === 'android') return 'android';
-    return 'web';
-  };
-
   // --- Verify OTP ---
   const verify = useCallback(
     async (entered: string) => {
@@ -138,39 +125,22 @@ export default function OtpEntryScreen() {
         const result = await onboardingApi.verifyOtp({ phoneNumber, code: entered });
 
         if (result.status === 'success') {
-          // ✅ OTP correct → check if user exists
-          try {
-            const existingUser = await onboardingApi.checkExistingUser({ phoneNumber });
+          const deviceId = `device_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+          // Write all tokens in parallel — saves ~100ms on cold storage.
+          await Promise.all([
+            SecureStore.setItemAsync('userId', result.userId),
+            SecureStore.setItemAsync('deviceId', deviceId),
+            SecureStore.setItemAsync('accessToken', result.accessToken),
+            SecureStore.setItemAsync('refreshToken', result.refreshToken),
+            SecureStore.setItemAsync('displayPhone', displayPhone),
+          ]);
 
-            if (existingUser.exists && existingUser.userId) {
-              // 👤 Existing user → login handoff → go to main app
-              const deviceInfo = {
-                deviceId: getDeviceId(),
-                deviceName: getDeviceName(),
-                platform: getPlatform(),
-              };
-
-              await onboardingApi.handleLoginHandoff({
-                phoneNumber,
-                userId: existingUser.userId,
-                deviceInfo,
-              });
-
-              // Navigate to the main app (tabs)
-              router.replace('/(tabs)');
-            } else {
-              // 🆕 New user → go to profile setup
-              router.replace({
-                pathname: '/profile-setup',
-                params: { phoneNumber },
-              });
-            }
-          } catch (error: any) {
-            // If checkExistingUser fails, we treat as new user to avoid blocking
-            console.warn('Failed to check existing user:', error);
+          if (result.routing === 'chats') {
+            router.replace('/(tabs)');
+          } else {
             router.replace({
               pathname: '/profile-setup',
-              params: { phoneNumber },
+              params: { phoneNumber, displayPhone },
             });
           }
         } else if (result.status === 'wrong_code') {
@@ -191,6 +161,9 @@ export default function OtpEntryScreen() {
             'You entered an incorrect OTP too many times. For your security, please start again and try once more.',
             [{ text: 'OK', onPress: () => router.replace('/phone-entry') }],
           );
+        } else if (result.status === 'expired') {
+          setOtp(Array(BOXES).fill(''));
+          setError('OTP expired. Request a new one.');
         }
       } catch {
         setError('Failed to verify OTP. Please try again.');
@@ -198,7 +171,7 @@ export default function OtpEntryScreen() {
         setIsVerifying(false);
       }
     },
-    [isLocked, lockoutSeconds, phoneNumber, runShake],
+    [isLocked, lockoutSeconds, phoneNumber, displayPhone, runShake],
   );
 
   // --- OTP input handlers ---
@@ -226,7 +199,7 @@ export default function OtpEntryScreen() {
       if (pos < BOXES) {
         inputRefs.current[pos]?.focus();
       } else if (next.every((d) => d !== '')) {
-        setTimeout(() => verify(next.join('')), 220);
+        verify(next.join(''));
       }
     }
   };
@@ -241,14 +214,17 @@ export default function OtpEntryScreen() {
   const handleResend = async () => {
     if (resendCooldown > 0) return;
 
+    // Fire resend optimistically — update UI immediately, don't block on network.
+    setResendCooldown(30);
+    setExpirySeconds(CODE_LIFETIME);
+    setOtp(Array(BOXES).fill(''));
+    setError('');
+
     try {
       await onboardingApi.sendOtp({ phoneNumber });
-      setResendCooldown(30);
-      setExpirySeconds(CODE_LIFETIME);
-      setOtp(Array(BOXES).fill(''));
-      setError('');
-      Alert.alert('OTP Sent', 'A new OTP has been sent.');
     } catch {
+      // If resend failed, stop the cooldown so user can retry.
+      setResendCooldown(0);
       Alert.alert('Error', 'Failed to resend OTP. Please try again.');
     }
   };
@@ -256,13 +232,14 @@ export default function OtpEntryScreen() {
   const clock = useMemo(() => formatClock(expirySeconds), [expirySeconds]);
 
   const displayNumber = useMemo(() => {
+    if (displayPhone) return displayPhone;
     const parsed = parsePhoneNumberFromString(phoneNumber);
     return parsed ? parsed.formatInternational() : phoneNumber;
-  }, [phoneNumber]);
+  }, [phoneNumber, displayPhone]);
 
   return (
     <SafeAreaView style={styles.safeRoot} edges={['top']}>
-      <LinearGradient
+      <View
         colors={[C.bg2, C.bg]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 0.45 }}
@@ -370,7 +347,7 @@ export default function OtpEntryScreen() {
             </Pressable>
           </View>
         </View>
-      </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 }
@@ -407,14 +384,14 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 36,
     marginBottom: 12,
-    fontFamily: 'Lora-Bold',
+    fontFamily: 'Lato-Bold',
     fontWeight: '700',
   },
   sub: {
     color: C.inkDim,
     fontSize: 15,
     lineHeight: 21,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Lato-Regular',
   },
   subRow: {
     flexDirection: 'row',
@@ -426,13 +403,13 @@ const styles = StyleSheet.create({
     color: C.accent,
     fontSize: 15,
     fontWeight: '600',
-    fontFamily: 'Inter-Medium',
+    fontFamily: 'Lato-Bold',
   },
   editText: {
     color: C.text,
     fontSize: 13,
     textDecorationLine: 'underline',
-    fontFamily: 'Inter-Medium',
+    fontFamily: 'Lato-Bold',
   },
   middle: {
     marginTop: 28,
@@ -456,7 +433,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: C.text,
     fontWeight: '600',
-    fontFamily: 'Inter-Medium',
+    fontFamily: 'Lato-Bold',
   },
   boxFilled: { borderColor: C.ink },
   boxError: { borderColor: C.fail },
@@ -469,22 +446,22 @@ const styles = StyleSheet.create({
   error: {
     color: C.fail,
     fontSize: 12.5,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Lato-Regular',
   },
   expiry: {
     color: C.inkDim,
     fontSize: 13.5,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Lato-Regular',
   },
   expiryTime: {
     color: C.accent,
     fontWeight: '600',
-    fontFamily: 'Inter-Medium',
+    fontFamily: 'Lato-Bold',
   },
   expired: {
     color: C.fail,
     fontSize: 12.5,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Lato-Regular',
   },
   actionSection: {
     flex: 1,
@@ -505,18 +482,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    fontFamily: 'Inter-Medium',
+    fontFamily: 'Lato-Bold',
   },
   resend: { alignItems: 'center', marginTop: 16, paddingVertical: 6 },
   resendText: {
     color: C.inkDim,
     fontSize: 13.5,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Lato-Regular',
   },
   resendLink: {
     color: C.accent,
     fontWeight: '600',
-    fontFamily: 'Inter-Medium',
+    fontFamily: 'Lato-Bold',
   },
   resendLinkDisabled: { color: C.inkDim },
 });

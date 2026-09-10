@@ -19,5 +19,13 @@
   },
   "dependencies": {
     "expo": "^57.0.15"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }

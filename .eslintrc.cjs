@@ -15,6 +15,12 @@ module.exports = {
       caughtErrorsIgnorePattern: '^_',
     },
   ],
+  '@typescript-eslint/no-namespace': [
+    'error',
+    {
+      allowDeclarations: true,
+    },
+  ],
   },
   extends: [
     'eslint:recommended',

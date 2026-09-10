@@ -13,26 +13,34 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { mockOnboardingApi } from '@/api/mockOnboardingApi';
+import { useSession } from '@/hooks/useSession';
+import { parsePhoneNumberFromString } from 'libphonenumber-js/mobile';
+import * as SecureStore from 'expo-secure-store';
 
 export default function DeviceHandoffScreen() {
-  const params = useLocalSearchParams<{ phoneNumber: string }>();
+  const params = useLocalSearchParams<{ phoneNumber?: string; userId: string }>();
   const phoneNumber = params.phoneNumber || '';
+  const userId = params.userId || '';
   const [isLoading, setIsLoading] = useState(true);
+  const { createSession } = useSession();
 
   useEffect(() => {
-    // Perform the device handoff when screen loads
     const performHandoff = async () => {
       try {
-        await mockOnboardingApi.loginNewDevice(phoneNumber);
+        await createSession(userId);
+        // Store the formatted phone number for display in Settings/Chats
+        if (phoneNumber) {
+          const parsed = parsePhoneNumberFromString(phoneNumber);
+          const formatted = parsed ? parsed.formatInternational() : phoneNumber;
+          await SecureStore.setItemAsync('displayPhone', formatted);
+        }
         setIsLoading(false);
-      } catch (error) {
-        // Even if handoff fails, allow user to continue
+      } catch {
         setIsLoading(false);
       }
     };
     performHandoff();
-  }, [phoneNumber]);
+  }, [userId, phoneNumber, createSession]);
 
   const handleContinue = () => {
     router.replace('/(tabs)');

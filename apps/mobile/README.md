@@ -1,52 +1,64 @@
-# Welcome to your Expo app 👋
+# WPT Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo (React Native) app for WPT. Uses file-based routing with `expo-router`.
 
-## Get started
+The project follows Expo's **Continuous Native Generation (CNG)** workflow, so it works with **both Expo Go and Android Studio**.
 
-1. Install dependencies
+## Prerequisites
 
-   ```bash
-   npm install
-   ```
+- Node.js >= 20
+- pnpm (see root `package.json` `packageManager`)
+- For Android Studio: Android Studio with an Android SDK + emulator/device
 
-2. Start the app
+## Two ways to run
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Expo Go (no native build required)
 
 ```bash
-npm run reset-project
+pnpm install
+pnpm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Scan the QR code with the Expo Go app:
+- Android: scan from the Expo Go app, or press `a` (Connecting to Expo Go requires your phone and machine on the same network)
+- Only JS-only + Expo Go-bundled native modules work here (all of this project's deps qualify)
 
-## Learn more
+### 2. Android Studio (native build)
 
-To learn more about developing your project with Expo, look at the following resources:
+The native `android/` folder is generated and gitignored. Generate it, then open it in Android Studio:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+pnpm install
+pnpm --filter @wpt/mobile prebuild:android    # or: npx expo prebuild -p android
+pnpm --filter @wpt/mobile android             # or: npx expo run:android
+```
 
-## Join the community
+Then open `apps/mobile/android` in Android Studio (File > Open) to edit native code,
+or hit **Run** in Android Studio to build and install a development build onto an emulator/device.
 
-Join our community of developers creating universal apps.
+> Whenever `app.json` changes (plugins, icons, package id, etc.), re-run `expo prebuild -p android`
+> to keep the native project in sync. EAS Build / `expo run:android` do this automatically.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Env
 
+Copy `.env.example` to `.env` (already gitignored). `EXPO_PUBLIC_*` variables are inlined at build time.
 
+## Scripts
+
+| Script | Description |
+| --- | --- |
+| `pnpm start` | Start Metro (Expo Go / dev build / web) |
+| `pnpm android` | Prebuild + compile + install a dev build on Android |
+| `pnpm prebuild:android` | Generate/refresh the `android/` native project |
+| `pnpm ios` | Compile + install a dev build on iOS simulator |
+| `pnpm web` | Run in a browser |
+| `pnpm lint` | ESLint |
+
+## Project structure
+
+- `app/` — expo-router routes
+- `components/` — reusable UI
+- `api/` — backend/mock/realtime clients
+- `providers/` — session & theme context
+- `hooks/` — shared hooks
+- `constants/` — typography, countries, etc.

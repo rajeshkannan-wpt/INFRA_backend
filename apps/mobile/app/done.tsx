@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textTransform: 'uppercase',
     color: C.ink,
-    fontFamily: 'SpaceGrotesk-Medium',
+    fontFamily: 'Lato-Bold',
   },
   center: {
     flex: 1,
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   done: {
     color: C.ink,
     fontSize: 30,
-    fontFamily: 'Fraunces-Black',
+    fontFamily: 'Lato-Black',
     letterSpacing: 1,
   },
 });

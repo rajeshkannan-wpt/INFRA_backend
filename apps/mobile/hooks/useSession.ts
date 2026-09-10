@@ -1,18 +1,25 @@
 // hooks/useSession.ts
+// §7.3 — Resume-time session validation + session management.
+//
+// On every foreground transition, the very first network call is
+// checkSessionValidity against /session/check. If the backend says
+// revokedAt is set (another device logged in while we were offline),
+// we silently log out — same as receiving a force_logout push.
+//
+// SECURITY: userId is never sent in request bodies — the backend
+// derives it from the verified JWT access token.
+
 import { useState, useEffect, useRef } from 'react';
 import { onboardingApi } from '@/api/onboardingApi';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import { Platform, AppState, AppStateStatus } from 'react-native';
 
-// Generate a unique device ID
 const getDeviceId = (): string => {
-  // In production, use a more robust method like expo-device
   return `device_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 };
 
 const getDeviceName = (): string => {
-  // In production, use expo-device to get actual device name
   const platform = Platform.OS === 'ios' ? 'iPhone' : 'Android';
   return `${platform} ${Platform.OS === 'ios' ? '' : 'Device'}`;
 };
@@ -22,35 +29,46 @@ export const useSession = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [deviceId, setDeviceId] = useState<string | null>(null);
+  const [displayPhone, setDisplayPhone] = useState<string | null>(null);
   const [sessionValid, setSessionValid] = useState(true);
   const [sessionMessage, setSessionMessage] = useState<string | null>(null);
-  
-  const checkInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const appState = useRef(AppState.currentState);
+
+  // ── §7.3: Resume-time validation ──
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next: AppStateStatus) => {
+      if (appState.current.match(/background/) && next === 'active') {
+        checkSession();
+      }
+      appState.current = next;
+    });
+
+    return () => sub.remove();
+  }, [userId, deviceId]);
 
   // Initialize session on mount
   useEffect(() => {
     initializeSession();
-    
-    // Check session validity every 30 seconds
-    checkInterval.current = setInterval(checkSession, 30000);
-    
-    return () => {
-      if (checkInterval.current) {
-        clearInterval(checkInterval.current);
-      }
-    };
   }, []);
 
   const initializeSession = async () => {
     try {
-      // Check if we have a stored session
       const storedUserId = await SecureStore.getItemAsync('userId');
       const storedDeviceId = await SecureStore.getItemAsync('deviceId');
-      
-      if (storedUserId && storedDeviceId) {
+      const storedAccessToken = await SecureStore.getItemAsync('accessToken');
+
+      if (storedUserId && storedDeviceId && storedAccessToken) {
         setUserId(storedUserId);
         setDeviceId(storedDeviceId);
-        await checkSession();
+        const storedDisplayPhone = await SecureStore.getItemAsync('displayPhone');
+        if (storedDisplayPhone) setDisplayPhone(storedDisplayPhone);
+        await validateSession(storedDeviceId);
+      } else if (storedUserId || storedDeviceId) {
+        await SecureStore.deleteItemAsync('userId');
+        await SecureStore.deleteItemAsync('deviceId');
+        await SecureStore.deleteItemAsync('accessToken');
+        await SecureStore.deleteItemAsync('refreshToken');
       }
     } catch (error) {
       console.error('Failed to initialize session:', error);
@@ -60,72 +78,81 @@ export const useSession = () => {
   };
 
   /**
-   * ONB-1.7: Check if the current session is still valid
-   * This is called periodically to detect if we've been silently logged out
+   * §7.3 — Core validation logic. Returns true if session is alive.
+   * Backend derives userId from JWT — only deviceId is sent.
    */
-  const checkSession = async () => {
-    if (!userId || !deviceId) return;
-
+  const validateSession = async (did: string): Promise<boolean> => {
     try {
       const result = await onboardingApi.checkSessionValidity({
-        userId,
-        deviceId,
+        deviceId: did,
       });
 
       if (!result.isValid) {
-        // Silent logout - we've been logged out on another device
-        console.log('🔒 Session invalidated - logged in on another device');
-        setSessionValid(false);
-        setSessionMessage(result.message || 'Logged in on another device');
-        
-        // Clear local session
-        await SecureStore.deleteItemAsync('userId');
-        await SecureStore.deleteItemAsync('deviceId');
-        setIsAuthenticated(false);
-        setUserId(null);
-        
-        // Redirect to login
-        router.replace('/phone-entry');
-      } else {
-        setSessionValid(true);
-        setSessionMessage(null);
+        await silentLogout();
+        return false;
       }
+
+      setSessionValid(true);
+      setSessionMessage(null);
+      return true;
     } catch (error) {
-      console.error('Failed to check session:', error);
+      console.warn('Session check failed (network?):', error);
+      return true;
     }
   };
 
+  /** Silent logout — clear all local state, navigate to phone-entry. */
+  const silentLogout = async () => {
+    setSessionValid(false);
+    setSessionMessage('Logged in on another device');
+    await SecureStore.deleteItemAsync('userId');
+    await SecureStore.deleteItemAsync('deviceId');
+    await SecureStore.deleteItemAsync('accessToken');
+    await SecureStore.deleteItemAsync('refreshToken');
+    await SecureStore.deleteItemAsync('displayPhone');
+    setIsAuthenticated(false);
+    setUserId(null);
+    setDeviceId(null);
+    setDisplayPhone(null);
+    router.replace('/phone-entry');
+  };
+
+  const checkSession = async () => {
+    if (!deviceId) return;
+    await validateSession(deviceId);
+  };
+
   /**
-   * ONB-1.7: Create a new session for the current device
-   * This handles the "new-device login handoff"
+   * ONB-1.7: Create a new session for the current device.
+   * Uses the refresh token from SecureStore to authenticate the handoff.
    */
-  const createSession = async (userId: string, phoneNumber: string) => {
+  const createSession = async (newUserId: string) => {
     try {
-      const deviceId = getDeviceId();
+      const newDeviceId = getDeviceId();
       const deviceName = getDeviceName();
       const platform = Platform.OS === 'ios' ? 'ios' : 'android';
 
+      // Get the refresh token — the handoff endpoint validates it server-side
+      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+
       const result = await onboardingApi.handleLoginHandoff({
-        phoneNumber,
-        userId,
+        refreshToken: refreshToken ?? '',
         deviceInfo: {
-          deviceId,
+          deviceId: newDeviceId,
           deviceName,
           platform,
         },
       });
 
-      // Store session locally
-      await SecureStore.setItemAsync('userId', userId);
-      await SecureStore.setItemAsync('deviceId', deviceId);
-      
-      setUserId(userId);
-      setDeviceId(deviceId);
+      await SecureStore.setItemAsync('userId', newUserId);
+      await SecureStore.setItemAsync('deviceId', newDeviceId);
+
+      setUserId(newUserId);
+      setDeviceId(newDeviceId);
       setIsAuthenticated(true);
       setSessionValid(true);
       setSessionMessage(result.message);
 
-      // Return the confirmation message for the new device
       return result.message;
     } catch (error) {
       console.error('Failed to create session:', error);
@@ -134,16 +161,17 @@ export const useSession = () => {
   };
 
   const logout = async () => {
-    try {
-      await SecureStore.deleteItemAsync('userId');
-      await SecureStore.deleteItemAsync('deviceId');
-      setIsAuthenticated(false);
-      setUserId(null);
-      setSessionValid(false);
-      router.replace('/phone-entry');
-    } catch (error) {
-      console.error('Failed to logout:', error);
-    }
+    await SecureStore.deleteItemAsync('userId');
+    await SecureStore.deleteItemAsync('deviceId');
+    await SecureStore.deleteItemAsync('accessToken');
+    await SecureStore.deleteItemAsync('refreshToken');
+    await SecureStore.deleteItemAsync('displayPhone');
+    setIsAuthenticated(false);
+    setUserId(null);
+    setDeviceId(null);
+    setDisplayPhone(null);
+    setSessionValid(false);
+    router.replace('/phone-entry');
   };
 
   return {
@@ -151,6 +179,7 @@ export const useSession = () => {
     isAuthenticated,
     userId,
     deviceId,
+    displayPhone,
     sessionValid,
     sessionMessage,
     createSession,
